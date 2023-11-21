@@ -1,0 +1,53 @@
+﻿@page "/robots/create"
+@inject BlazorCRUD.Data.ApplicationDbContext DB
+@using BlazorCRUD
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Robot</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Robot" OnValidSubmit="AddRobot" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Robot.Name" class="form-control" /> 
+                <ValidationMessage For="() => Robot.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="company" class="form-label">Company:</label> 
+                <InputText id="company" @bind-Value="Robot.Company" class="form-control" /> 
+                <ValidationMessage For="() => Robot.Company" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="releasedate" class="form-label">ReleaseDate:</label> 
+                <InputDate id="releasedate" @bind-Value="Robot.ReleaseDate" class="form-control" /> 
+                <ValidationMessage For="() => Robot.ReleaseDate" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/robots">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public Robot Robot { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddRobot()
+    {
+        DB.Robot.Add(Robot);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/robots");
+    }
+}

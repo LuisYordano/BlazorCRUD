@@ -1,0 +1,96 @@
+﻿@page "/Robots/edit"
+@inject BlazorCRUD.Data.ApplicationDbContext DB
+@using BlazorCRUD
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Robot</h4>
+<hr />
+@if (Robot is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Robot" OnValidSubmit="UpdateRobot" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Robot.Id" value="@Robot.Id" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Robot.Name" class="form-control" />
+                    <ValidationMessage For="() => Robot.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="company" class="form-label">Company:</label>
+                    <InputText id="company" @bind-Value="Robot.Company" class="form-control" />
+                    <ValidationMessage For="() => Robot.Company" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="releasedate" class="form-label">ReleaseDate:</label>
+                    <InputDate id="releasedate" @bind-Value="Robot.ReleaseDate" class="form-control" />
+                    <ValidationMessage For="() => Robot.ReleaseDate" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/robots">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Robot? Robot { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Robot ??= await DB.Robot.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Robot is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateRobot()
+    {
+        DB.Attach(Robot!).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!RobotExists(Robot!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/robots");
+    }
+
+    bool RobotExists(int id)
+    {
+        return DB.Robot.Any(e => e.Id == id);
+    }
+}

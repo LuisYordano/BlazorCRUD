@@ -1,0 +1,49 @@
+﻿@page "/robots/details"
+@inject BlazorCRUD.Data.ApplicationDbContext DB
+@using BlazorCRUD
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Robot</h4>
+    <hr />
+    @if (robot is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@robot.Name</dd>
+            <dt class="col-sm-2">Company</dt>
+            <dd class="col-sm-10">@robot.Company</dd>
+            <dt class="col-sm-2">ReleaseDate</dt>
+            <dd class="col-sm-10">@robot.ReleaseDate</dd>
+        </dl>
+        <div>
+            <a href="@($"/robots/edit?id={robot.Id}")">Edit</a> |
+            <a href="@($"/robots")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Robot? robot;
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        robot = await DB.Robot.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (robot is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,31 @@
+﻿@page "/robots"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject BlazorCRUD.Data.ApplicationDbContext DB
+@using BlazorCRUD
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="robots/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.Robot" Pagination="state">
+    <PropertyColumn Property="robot => robot.Name" Sortable="true" />
+    <PropertyColumn Property="robot => robot.Company"  />
+    <PropertyColumn Property="robot => robot.ReleaseDate" Title="Release Date" Format="MM/dd/yyyy" />
+
+    <TemplateColumn Context="robot">
+        <a href="@($"robots/edit?id={robot.Id}")">Edit</a> |
+        <a href="@($"robots/details?id={robot.Id}")">Details</a> |
+        <a href="@($"robots/delete?id={robot.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+<Paginator State="state"/>
+
+@code {
+    PaginationState state = new PaginationState { ItemsPerPage = 2 };
+}
